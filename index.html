@@ -271,4 +271,78 @@ function initModel(){
     { text: "Nucleocapsídeo", pos: [-0.5, -1.2, 0.5] }
   ];
   const labelElements = labelData.map(item => {
-    con
+    const el = document.createElement("div");
+    el.className = "tag";
+    el.textContent = item.text;
+    document.getElementById("labels").appendChild(el);
+    return { element: el, position: new THREE.Vector3(...item.pos) };
+  });
+
+  document.getElementById("cut").addEventListener("click", () => {
+    cutEnabled = !cutEnabled;
+    innerShell.visible = cutEnabled;
+    nuc.visible = cutEnabled;
+    document.getElementById("cut").textContent = cutEnabled ? "Corte: ligado" : "Corte: desligado";
+    document.getElementById("cut").classList.toggle("active", cutEnabled);
+  });
+  document.getElementById("spin").addEventListener("click", () => {
+    rotating = !rotating;
+    document.getElementById("spin").textContent = rotating ? "Rotação: ligada" : "Rotação: parada";
+    document.getElementById("spin").classList.toggle("active", rotating);
+  });
+  document.getElementById("reset").addEventListener("click", () => {
+    camera.position.set(0, 2.4, 10.5);
+    controls.target.set(0, 0, 0);
+    controls.update();
+    root.rotation.set(0, 0, 0);
+  });
+  document.getElementById("labelsBtn").addEventListener("click", () => {
+    labelsEnabled = !labelsEnabled;
+    document.getElementById("labels").style.display = labelsEnabled ? "block" : "none";
+    document.getElementById("labelsBtn").textContent = labelsEnabled ? "Etiquetas: ligadas" : "Etiquetas: desligadas";
+    document.getElementById("labelsBtn").classList.toggle("active", labelsEnabled);
+  });
+
+  function animate() {
+    requestAnimationFrame(animate);
+    if (rotating) { root.rotation.y += 0.0025; }
+    controls.update();
+    labelElements.forEach(label => {
+      const p = label.position.clone();
+      p.applyMatrix4(root.matrixWorld);
+      p.project(camera);
+      const x = (p.x * 0.5 + 0.5) * innerWidth;
+      const y = (-p.y * 0.5 + 0.5) * innerHeight;
+      label.element.style.left = x + "px";
+      label.element.style.top = y + "px";
+      label.element.style.display = p.z < 1 ? "block" : "none";
+    });
+    renderer.render(scene, camera);
+  }
+  animate();
+  window.addEventListener("resize", () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+  requestAnimationFrame(()=>{
+    camera.aspect = innerWidth/innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(innerWidth, innerHeight);
+  });
+}
+
+document.getElementById('openModel').addEventListener('click',()=>{
+  document.getElementById('intro').style.display='none';
+  document.getElementById('viewer').style.display='block';
+  document.body.style.overflow='hidden';
+  initModel();
+});
+document.getElementById('backIntro').addEventListener('click',()=>{
+  document.getElementById('viewer').style.display='none';
+  document.getElementById('intro').style.display='block';
+  document.body.style.overflow='auto';
+});
+</script>
+</body>
+</html>
