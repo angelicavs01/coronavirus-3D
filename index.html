@@ -98,7 +98,7 @@
       <div class="fact-strip"><span class="fact-pill">Biomedicina</span><span class="fact-pill">Pesquisa científica</span><span class="fact-pill">Genômica viral</span></div>
     </div>
     <figure class="portrait-wrap">
-      <img class="portrait" src="https://commons.wikimedia.org/wiki/Special:FilePath/Jaqueline_Goes_-_Pr%C3%AAmio_Mulheres_na_Ci%C3%AAncia.jpg?width=1000" alt="Jaqueline Goes de Jesus em cerimônia do Prêmio Mulheres na Ciência" loading="lazy">
+      <img class="portrait" src="https://thumb.wikimedia.org/wikipedia/commons/thumb/d/d3/Jaqueline_Goes_-_Pr%C3%AAmio_Mulheres_na_Ci%C3%AAncia.jpg/960px-Jaqueline_Goes_-_Pr%C3%AAmio_Mulheres_na_Ci%C3%AAncia.jpg" alt="Jaqueline Goes de Jesus em cerimônia do Prêmio Mulheres na Ciência" loading="lazy">
       <figcaption class="photo-credit">Foto: Raisa Mesquita / Câmara dos Deputados. Imagem licenciada sob CC BY 4.0. <a href="https://commons.wikimedia.org/wiki/File:Jaqueline_Goes_-_Pr%C3%AAmio_Mulheres_na_Ci%C3%AAncia.jpg" target="_blank" rel="noopener">Ver crédito e licença</a>.</figcaption>
     </figure>
   </section>
@@ -147,7 +147,7 @@
 <div id="hint">Arraste com o dedo ou mouse para girar • use dois dedos ou a roda para aproximar</div></div>
 
 <script>
- document.getElementById('openModel').addEventListener('click',()=>{document.getElementById('intro').style.display='none';document.getElementById('viewer').style.display='block';document.body.style.overflow='hidden';});
+ document.getElementById('openModel').addEventListener('click',()=>{document.getElementById('intro').style.display='none';document.getElementById('viewer').style.display='block';document.body.style.overflow='hidden';window.dispatchEvent(new Event('show-model'));});
  document.getElementById('backIntro').addEventListener('click',()=>{document.getElementById('viewer').style.display='none';document.getElementById('intro').style.display='block';document.body.style.overflow='auto';});
 </script>
 <script type="importmap">
@@ -169,6 +169,7 @@ renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.18;
 host.appendChild(renderer.domElement);
+window.addEventListener('show-model',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
 
 scene.add(new THREE.HemisphereLight(0xe6d5ff, 0x302044, 2.0));
 const key = new THREE.DirectionalLight(0xffffff, 3.0); key.position.set(5,7,8); scene.add(key);
@@ -258,6 +259,4 @@ for (const tilt of [[.25,.15,.1],[-.35,.55,.25]]) {
 }
 
 // Soft illuminated base beneath the specimen.
-const base = new THREE.Mesh(new THREE.CylinderGeometry(1.55,1.72,.12,72), new THREE.MeshStandardMaterial({color:0x1a3447,metalness:.55,roughness:.3}));
-base.position.y=-2.72; root.add(base);
-const baseRim = new THREE.Mesh(new THREE.TorusGeometry(1.58,.035,10,90), new THREE.MeshBasicMaterial({
+const base = new THREE.Mesh(new T
