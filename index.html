@@ -32,9 +32,96 @@
     header { top:10px; left:10px; } header p { max-width:55vw; }
     #hint { bottom:8px; font-size:10px; }
   }
+
+  body { overflow:auto; }
+  #intro { min-height:100vh; padding:38px 18px 48px; background:radial-gradient(ellipse at 50% 0%,#284c63 0%,#142b3c 48%,#081522 100%); position:relative; z-index:20; }
+  .intro-wrap { max-width:900px; margin:0 auto; }
+  .eyebrow { color:#a9ddf6; font-size:11px; letter-spacing:.18em; text-transform:uppercase; font-weight:700; }
+  #intro h1 { font-size:clamp(30px,6vw,54px); line-height:1.08; margin:12px 0; }
+  .lead { color:#d3e4ef; font-size:clamp(15px,2vw,18px); max-width:720px; }
+  .bio-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:13px; margin:26px 0; }
+  .bio-card { background:#ffffff0d; border:1px solid #b8dff02b; border-radius:16px; padding:17px; }
+  .bio-card h2 { margin:0 0 8px; color:#bce7fb; font-size:16px; }
+  .bio-card p { margin:0; color:#d9e5ed; font-size:14px; }
+  .timeline { border-left:2px solid #76c7e8; padding-left:16px; margin:22px 0 28px; color:#d9e5ed; }
+  .timeline p { margin:8px 0; }
+  .cta { display:inline-block; border:1px solid #9bdcff; border-radius:12px; padding:13px 18px; background:linear-gradient(180deg,#376a85,#21475f); color:white; font-weight:750; font-size:15px; }
+  .note { color:#a9bdcc; font-size:12px; margin-top:16px; }
+  #viewer { display:none; position:fixed; inset:0; z-index:10; background:#07121d; }
+  #backIntro { position:fixed; z-index:30; top:12px; left:12px; padding:9px 12px; }
+  @media(max-width:600px){ #intro{padding:28px 15px 38px;} }
+
+
+  /* Tema roxo e lilás da turma */
+  :root { color-scheme: dark; --panel: rgba(30,16,52,.92); --line: rgba(221,190,255,.28); }
+  body { background: radial-gradient(ellipse at 48% 42%, #55317a 0%, #2b1745 42%, #130b22 78%, #090511 100%); }
+  body:before { background-image: radial-gradient(#e7d5ff 0.7px, transparent .7px); opacity:.16; }
+  #intro { background: radial-gradient(ellipse at 50% 0%, #69439a 0%, #321d50 48%, #130b22 100%); }
+  .eyebrow { color:#e0c2ff; }
+  #intro h1 { color:#fff; }
+  .lead { color:#eadcf8; }
+  .bio-card { background:rgba(255,255,255,.075); border-color:#dfc5ff44; box-shadow:0 12px 35px #09031133; }
+  .bio-card h2 { color:#e7ceff; }
+  .bio-card p, .timeline { color:#f0e6fa; }
+  .timeline { border-left-color:#c69aff; }
+  .cta, button { border-color:#c69aff88; background:linear-gradient(180deg,#8052b5,#4e2d78); }
+  button:hover { background:linear-gradient(180deg,#986bc9,#603b8d); border-color:#ead5ff; }
+  button.active { background:linear-gradient(180deg,#9b70cc,#684393); border-color:#ead5ff; box-shadow:0 0 15px #c69aff44; }
+  #viewer { background:#10091c; }
+  #panel { background:linear-gradient(145deg,rgba(48,27,72,.95),rgba(19,10,32,.94)); border-color:#d7b5ff55; }
+  #panel h2 { color:#ead8ff; }
+  #hint { background:rgba(24,12,39,.88); border-color:#d7b5ff55; }
+  header:after { border-color:#d7b5ff66; color:#e2caff; background:#211133cc; }
+  .tag { background:#1a0e2beF; border-color:#d9c0ff88; }
+  .hero { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(230px,.85fr); align-items:center; gap:28px; margin:24px 0 26px; }
+  .hero-copy { min-width:0; }
+  .portrait-wrap { position:relative; max-width:390px; justify-self:end; width:100%; }
+  .portrait { display:block; width:100%; aspect-ratio:4/3; object-fit:cover; object-position:center 30%; border-radius:22px; border:2px solid #e4caff99; box-shadow:0 18px 55px #08031188; }
+  .photo-credit { color:#d8c4ed; font-size:10px; margin:7px 3px 0; line-height:1.4; }
+  .photo-credit a, .sources a { color:#e5ccff; }
+  .fact-strip { display:flex; flex-wrap:wrap; gap:9px; margin-top:17px; }
+  .fact-pill { border:1px solid #d9bdff66; background:#ffffff12; color:#f3eaff; border-radius:99px; padding:7px 11px; font-size:11px; }
+  .sources { margin-top:24px; padding:17px; border:1px solid #d9bdff44; background:#ffffff0a; border-radius:15px; color:#e8ddf4; }
+  .sources h2 { color:#e7ceff; font-size:15px; margin:0 0 9px; }
+  .sources p { font-size:12px; margin:7px 0; }
+  @media(max-width:650px){ .hero { grid-template-columns:1fr; gap:15px; margin-top:18px; } .portrait-wrap { justify-self:center; max-width:330px; grid-row:1; } .portrait { aspect-ratio:16/10; } }
+
 </style>
 </head>
 <body>
+<main id="intro"><div class="intro-wrap">
+  <div class="eyebrow">Ciência brasileira • Mulheres na ciência</div>
+  <section class="hero">
+    <div class="hero-copy">
+      <h1>Conheça Jaqueline Goes de Jesus</h1>
+      <p class="lead">Uma biomédica e pesquisadora brasileira que participou de um marco da ciência: o sequenciamento dos primeiros genomas do SARS-CoV-2 identificados no Brasil.</p>
+      <div class="fact-strip"><span class="fact-pill">Biomedicina</span><span class="fact-pill">Pesquisa científica</span><span class="fact-pill">Genômica viral</span></div>
+    </div>
+    <figure class="portrait-wrap">
+      <img class="portrait" src="https://commons.wikimedia.org/wiki/Special:FilePath/Jaqueline_Goes_-_Pr%C3%AAmio_Mulheres_na_Ci%C3%AAncia.jpg?width=1000" alt="Jaqueline Goes de Jesus em cerimônia do Prêmio Mulheres na Ciência" loading="lazy">
+      <figcaption class="photo-credit">Foto: Raisa Mesquita / Câmara dos Deputados. Imagem licenciada sob CC BY 4.0. <a href="https://commons.wikimedia.org/wiki/File:Jaqueline_Goes_-_Pr%C3%AAmio_Mulheres_na_Ci%C3%AAncia.jpg" target="_blank" rel="noopener">Ver crédito e licença</a>.</figcaption>
+    </figure>
+  </section>
+  <div class="bio-grid">
+    <section class="bio-card"><h2>Quem é ela?</h2><p>Jaqueline Goes de Jesus é biomédica, pesquisadora e doutora em Patologia Humana e Experimental pela Universidade Federal da Bahia. Sua trajetória envolve estudos sobre vírus e vigilância genômica.</p></section>
+    <section class="bio-card"><h2>Um marco na pandemia</h2><p>Em fevereiro de 2020, ela integrou e coordenou parte da equipe que sequenciou o genoma do SARS-CoV-2 do primeiro caso confirmado de COVID-19 no Brasil. O trabalho foi concluído em aproximadamente 48 horas.</p></section>
+    <section class="bio-card"><h2>Por que isso foi importante?</h2><p>O sequenciamento permite conhecer o material genético do vírus, comparar amostras e acompanhar sua circulação e suas mudanças. Esse conhecimento ajuda a orientar a vigilância em saúde.</p></section>
+  </div>
+  <h2 style="color:#ead8ff;font-size:19px">Sua contribuição para a ciência</h2>
+  <div class="timeline">
+    <p><strong>Formação:</strong> graduada em Biomedicina pela Escola Bahiana de Medicina e Saúde Pública; mestre em Biotecnologia e doutora em Patologia Humana e Experimental.</p>
+    <p><strong>2020:</strong> participou da equipe que sequenciou o genoma do SARS-CoV-2 identificado no primeiro caso de COVID-19 no Brasil, em parceria com instituições brasileiras e internacionais.</p>
+    <p><strong>Legado:</strong> seu trabalho reforça a importância da pesquisa científica, da colaboração entre equipes e da presença de mulheres na ciência.</p>
+  </div>
+  <button class="cta" id="openModel">Explorar o coronavírus em 3D →</button>
+  <p class="note">O modelo 3D é uma representação didática e esquemática das estruturas do SARS-CoV-2, não uma imagem em escala molecular.</p>
+  <section class="sources"><h2>Fontes para conhecer mais</h2>
+    <p><a href="https://www.bahiana.edu.br/noticia/32890/pesquisadora-ex-aluna-do-curso-de-biomedicina-e-professora-adjunta-da-bahiana-dra-jaqueline-goes-lidera-grupo-que-sequenciou-genoma-do-coronavirus/" target="_blank" rel="noopener">Escola Bahiana de Medicina e Saúde Pública</a> — trajetória e sequenciamento do genoma.</p>
+    <p><a href="https://bv.fapesp.br/pt/pesquisador/704746/jaqueline-goes-de-jesus/" target="_blank" rel="noopener">FAPESP — Biblioteca Virtual</a> — perfil acadêmico e pesquisas.</p>
+    <p><a href="https://brasil.un.org/pt-br/99258-onu-convida-brasileira-que-mapeou-genomas-do-primeiro-caso-de-covid-19-na-am%C3%A9rica-latina" target="_blank" rel="noopener">Nações Unidas no Brasil</a> — participação na iniciativa Equipe Halo.</p>
+  </section>
+</div></main>
+<div id="viewer"><button id="backIntro">← Voltar à apresentação</button>
 <div id="scene"></div>
 <header>
   <h1>SARS-CoV-2</h1>
@@ -57,8 +144,12 @@
   <div id="status">Explore o modelo em qualquer ângulo. Arraste para girar e use o gesto de pinça para ampliar.</div>
 </aside>
 <div id="labels"></div>
-<div id="hint">Arraste com o dedo ou mouse para girar • use dois dedos ou a roda para aproximar</div>
+<div id="hint">Arraste com o dedo ou mouse para girar • use dois dedos ou a roda para aproximar</div></div>
 
+<script>
+ document.getElementById('openModel').addEventListener('click',()=>{document.getElementById('intro').style.display='none';document.getElementById('viewer').style.display='block';document.body.style.overflow='hidden';});
+ document.getElementById('backIntro').addEventListener('click',()=>{document.getElementById('viewer').style.display='none';document.getElementById('intro').style.display='block';document.body.style.overflow='auto';});
+</script>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
 </script>
@@ -68,7 +159,7 @@ import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const host = document.getElementById('scene');
 const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0x101c2a, 12, 27);
+scene.fog = new THREE.Fog(0x1b102b, 12, 27);
 const camera = new THREE.PerspectiveCamera(42, innerWidth/innerHeight, .1, 100);
 camera.position.set(0, 2.4, 10.5);
 const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
@@ -79,9 +170,9 @@ renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.18;
 host.appendChild(renderer.domElement);
 
-scene.add(new THREE.HemisphereLight(0xcde8ff, 0x243142, 2.0));
+scene.add(new THREE.HemisphereLight(0xe6d5ff, 0x302044, 2.0));
 const key = new THREE.DirectionalLight(0xffffff, 3.0); key.position.set(5,7,8); scene.add(key);
-const rim = new THREE.PointLight(0x57bfe8, 35, 18); rim.position.set(-5,1,-5); scene.add(rim);
+const rim = new THREE.PointLight(0xb58ce8, 35, 18); rim.position.set(-5,1,-5); scene.add(rim);
 const fill = new THREE.PointLight(0xffc77c, 18, 15); fill.position.set(4,-4,4); scene.add(fill);
 
 const root = new THREE.Group(); scene.add(root);
@@ -156,11 +247,11 @@ for(let i=0;i<16;i++){
 }
 
 // Thin outer halo, purely visual.
-const halo=new THREE.Mesh(new THREE.SphereGeometry(R+.035,64,48),new THREE.MeshBasicMaterial({color:0x67c8e7,wireframe:true,transparent:true,opacity:.09}));
+const halo=new THREE.Mesh(new THREE.SphereGeometry(R+.035,64,48),new THREE.MeshBasicMaterial({color:0xc49aff,wireframe:true,transparent:true,opacity:.11}));
 root.add(halo);
 
 // Delicate orbital rings add a polished scientific-display feel.
-const orbitMat = new THREE.MeshBasicMaterial({color:0x72c9ee, transparent:true, opacity:.20});
+const orbitMat = new THREE.MeshBasicMaterial({color:0xc49aff, transparent:true, opacity:.22});
 for (const tilt of [[.25,.15,.1],[-.35,.55,.25]]) {
   const ring = new THREE.Mesh(new THREE.TorusGeometry(R+0.42,.008,8,180), orbitMat);
   ring.rotation.set(...tilt); root.add(ring);
@@ -169,48 +260,4 @@ for (const tilt of [[.25,.15,.1],[-.35,.55,.25]]) {
 // Soft illuminated base beneath the specimen.
 const base = new THREE.Mesh(new THREE.CylinderGeometry(1.55,1.72,.12,72), new THREE.MeshStandardMaterial({color:0x1a3447,metalness:.55,roughness:.3}));
 base.position.y=-2.72; root.add(base);
-const baseRim = new THREE.Mesh(new THREE.TorusGeometry(1.58,.035,10,90), new THREE.MeshBasicMaterial({color:0x63c5eb,transparent:true,opacity:.65}));
-baseRim.rotation.x=Math.PI/2; baseRim.position.y=-2.65; root.add(baseRim);
-
-// Label anchors and leader lines.
-const labelLayer=document.getElementById('labels');
-const labels=[
- ['Proteína Spike (S)', new THREE.Vector3(1.25,1.35,1.35), '#ffb84d'],
- ['Envelope viral (E)', new THREE.Vector3(1.9,.15,.7), '#4aa9c7'],
- ['Proteína de membrana (M)', new THREE.Vector3(1.75,-.8,.85), '#e7d36d'],
- ['Proteína do nucleocapsídeo (N)', new THREE.Vector3(-.35,.2,.95), '#d889c8'],
- ['RNA viral', new THREE.Vector3(.25,-.55,.95), '#9ce6a8'],
- ['Nucleocapsídeo', new THREE.Vector3(-.5,-.9,.8), '#b58ce8']
-];
-const labelEls=labels.map(([name])=>{const el=document.createElement('div');el.className='tag';el.textContent=name;labelLayer.appendChild(el);return el;});
-const lineMat=new THREE.LineBasicMaterial({color:0xd8e8f5,transparent:true,opacity:.65});
-const lineObjs=labels.map(([name,anchor])=>{const geo=new THREE.BufferGeometry().setFromPoints([anchor,anchor.clone().multiplyScalar(1.25)]);const line=new THREE.Line(geo,lineMat);root.add(line);return line;});
-
-const controls=new OrbitControls(camera,renderer.domElement);
-controls.enableDamping=true; controls.dampingFactor=.06; controls.minDistance=4.2; controls.maxDistance=17; controls.target.set(0,0,0);
-let autoSpin=true, cutOn=true, labelsOn=true;
-document.getElementById('cut').onclick=()=>{cutOn=!cutOn;cutGroup.visible=cutOn;nuc.visible=cutOn;document.getElementById('cut').textContent='Corte: '+(cutOn?'ligado':'desligado');document.getElementById('cut').classList.toggle('active',cutOn);};
-document.getElementById('spin').onclick=()=>{autoSpin=!autoSpin;document.getElementById('spin').textContent='Rotação: '+(autoSpin?'ligada':'pausada');document.getElementById('spin').classList.toggle('active',autoSpin);};
-document.getElementById('labelsBtn').onclick=()=>{labelsOn=!labelsOn;labelLayer.style.display=labelsOn?'block':'none';lineObjs.forEach(x=>x.visible=labelsOn);document.getElementById('labelsBtn').textContent='Etiquetas: '+(labelsOn?'ligadas':'desligadas');document.getElementById('labelsBtn').classList.toggle('active',labelsOn);};
-document.getElementById('reset').onclick=()=>{camera.position.set(0,2.4,10.5);controls.target.set(0,0,0);controls.update();root.rotation.set(0,0,0);};
-
-function updateLabels(){
-  labels.forEach(([name,anchor],i)=>{
-    const world=anchor.clone().applyMatrix4(root.matrixWorld).project(camera);
-    const x=(world.x*.5+.5)*innerWidth, y=(-world.y*.5+.5)*innerHeight;
-    labelEls[i].style.left=x+'px'; labelEls[i].style.top=y+'px';
-    const visible=world.z<1 && x>0 && x<innerWidth && y>0 && y<innerHeight;
-    labelEls[i].style.display=visible?'block':'none';
-    lineObjs[i].visible=labelsOn && visible;
-  });
-}
-function animate(){
-  requestAnimationFrame(animate);
-  if(autoSpin && !controls.state) root.rotation.y+=.0018;
-  controls.update(); root.updateMatrixWorld(); updateLabels(); renderer.render(scene,camera);
-}
-animate();
-addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
-</script>
-</body>
-</html>
+const baseRim = new THREE.Mesh(new THREE.TorusGeometry(1.58,.035,10,90), new THREE.MeshBasicMaterial({
