@@ -6,10 +6,11 @@
 <title>SARS-CoV-2 | Laboratório 3D Interativo</title>
 <style>
   :root { color-scheme: dark; --panel: rgba(12,20,32,.88); --line: rgba(190,215,235,.24); }
-  * { box-sizing: border-box; }
+    * { box-sizing: border-box; }
   body { margin:0; background: radial-gradient(ellipse at 48% 42%, #29465a 0%, #172b3c 36%, #0b1724 72%, #060d16 100%); color:#f1f7fc; font: 14px/1.5 system-ui, sans-serif; overflow:hidden; } 
   body:before { content:""; position:fixed; inset:0; pointer-events:none; opacity:.22; background-image:radial-gradient(#b9e4ff 0.7px, transparent .7px); background-size:34px 34px; mask-image:linear-gradient(transparent,black 22%,black 78%,transparent); }
-  #scene { position:fixed; inset:0; }
+  #scene { position:absolute; inset:0; }
+  #scene canvas { display:block; width:100% !important; height:100% !important; }
   header { position:fixed; top:14px; left:16px; z-index:5; max-width:min(560px, calc(100vw - 32px)); pointer-events:none; text-shadow:0 2px 12px #000; }
   h1 { margin:0 0 5px; font-size:clamp(19px,3vw,29px); letter-spacing:.015em; font-weight:750; }
   header p { margin:0; color:#c4d5e4; font-size:12px; }
@@ -32,7 +33,6 @@
     header { top:10px; left:10px; } header p { max-width:55vw; }
     #hint { bottom:8px; font-size:10px; }
   }
-
   body { overflow:auto; }
   #intro { min-height:100vh; padding:38px 18px 48px; background:radial-gradient(ellipse at 50% 0%,#284c63 0%,#142b3c 48%,#081522 100%); position:relative; z-index:20; }
   .intro-wrap { max-width:900px; margin:0 auto; }
@@ -50,9 +50,6 @@
   #viewer { display:none; position:fixed; inset:0; z-index:10; background:#07121d; }
   #backIntro { position:fixed; z-index:30; top:12px; left:12px; padding:9px 12px; }
   @media(max-width:600px){ #intro{padding:28px 15px 38px;} }
-
-
-  /* Tema roxo e lilás da turma */
   :root { color-scheme: dark; --panel: rgba(30,16,52,.92); --line: rgba(221,190,255,.28); }
   body { background: radial-gradient(ellipse at 48% 42%, #55317a 0%, #2b1745 42%, #130b22 78%, #090511 100%); }
   body:before { background-image: radial-gradient(#e7d5ff 0.7px, transparent .7px); opacity:.16; }
@@ -72,7 +69,7 @@
   #panel h2 { color:#ead8ff; }
   #hint { background:rgba(24,12,39,.88); border-color:#d7b5ff55; }
   header:after { border-color:#d7b5ff66; color:#e2caff; background:#211133cc; }
-  .tag { background:#1a0e2beF; border-color:#d9c0ff88; }
+  .tag { background:#1a0e2bef; border-color:#d9c0ff88; }
   .hero { display:grid; grid-template-columns:minmax(0,1.15fr) minmax(230px,.85fr); align-items:center; gap:28px; margin:24px 0 26px; }
   .hero-copy { min-width:0; }
   .portrait-wrap { position:relative; max-width:390px; justify-self:end; width:100%; }
@@ -85,7 +82,6 @@
   .sources h2 { color:#e7ceff; font-size:15px; margin:0 0 9px; }
   .sources p { font-size:12px; margin:7px 0; }
   @media(max-width:650px){ .hero { grid-template-columns:1fr; gap:15px; margin-top:18px; } .portrait-wrap { justify-self:center; max-width:330px; grid-row:1; } .portrait { aspect-ratio:16/10; } }
-
 </style>
 </head>
 <body>
@@ -146,10 +142,6 @@
 <div id="labels"></div>
 <div id="hint">Arraste com o dedo ou mouse para girar • use dois dedos ou a roda para aproximar</div></div>
 
-<script>
- document.getElementById('openModel').addEventListener('click',()=>{document.getElementById('intro').style.display='none';document.getElementById('viewer').style.display='block';document.body.style.overflow='hidden';window.dispatchEvent(new Event('show-model'));});
- document.getElementById('backIntro').addEventListener('click',()=>{document.getElementById('viewer').style.display='none';document.getElementById('intro').style.display='block';document.body.style.overflow='auto';});
-</script>
 <script type="importmap">
 {"imports":{"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js","three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
 </script>
@@ -157,221 +149,126 @@
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
-const host = document.getElementById('scene');
-const scene = new THREE.Scene();
-scene.fog = new THREE.Fog(0x1b102b, 12, 27);
-const camera = new THREE.PerspectiveCamera(42, innerWidth/innerHeight, .1, 100);
-camera.position.set(0, 2.4, 10.5);
-const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
-renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
-renderer.setSize(innerWidth, innerHeight);
-renderer.outputColorSpace = THREE.SRGBColorSpace;
-renderer.toneMapping = THREE.ACESFilmicToneMapping;
-renderer.toneMappingExposure = 1.18;
-host.appendChild(renderer.domElement);
-window.addEventListener('show-model',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
+let started = false;
 
-scene.add(new THREE.HemisphereLight(0xe6d5ff, 0x302044, 2.0));
-const key = new THREE.DirectionalLight(0xffffff, 3.0); key.position.set(5,7,8); scene.add(key);
-const rim = new THREE.PointLight(0xb58ce8, 35, 18); rim.position.set(-5,1,-5); scene.add(rim);
-const fill = new THREE.PointLight(0xffc77c, 18, 15); fill.position.set(4,-4,4); scene.add(fill);
+function initModel(){
+  if(started) return;
+  started = true;
 
-const root = new THREE.Group(); scene.add(root);
-const R = 2.15;
-const sphereGeo = new THREE.SphereGeometry(R, 96, 72);
-const envelopeMat = new THREE.MeshPhysicalMaterial({color:0x287e9d, roughness:.32, metalness:.05, transparent:true, opacity:.58, side:THREE.DoubleSide, transmission:.08, thickness:.2});
-const envelope = new THREE.Mesh(sphereGeo, envelopeMat); root.add(envelope);
-
-// Cutaway: a dark inner spherical cap makes the open section readable.
-const cutGroup = new THREE.Group(); root.add(cutGroup);
-const innerGeo = new THREE.SphereGeometry(R*.79, 72, 56);
-const innerMat = new THREE.MeshPhysicalMaterial({color:0x25364b, roughness:.72, metalness:.08, transparent:true, opacity:.9, side:THREE.DoubleSide});
-const innerShell = new THREE.Mesh(innerGeo, innerMat); cutGroup.add(innerShell);
-
-// Interior nucleocapsid: coiled RNA-like strand and N-protein beads.
-const nuc = new THREE.Group(); root.add(nuc);
-const nucGeo = new THREE.SphereGeometry(1.15, 48, 36);
-const nucMesh = new THREE.Mesh(nucGeo, new THREE.MeshPhysicalMaterial({color:0x7850a8, roughness:.4, transparent:true, opacity:.23, side:THREE.DoubleSide}));
-nuc.add(nucMesh);
-const curvePts=[];
-for(let i=0;i<520;i++){
-  const t=i/519, a=t*Math.PI*13;
-  const rad=.18+.75*t;
-  curvePts.push(new THREE.Vector3(rad*Math.cos(a), .58*Math.sin(a*1.7), rad*Math.sin(a)));
-}
-const rnaCurve=new THREE.CatmullRomCurve3(curvePts);
-const rna=new THREE.Mesh(new THREE.TubeGeometry(rnaCurve, 700, .035, 8, false), new THREE.MeshStandardMaterial({color:0x9ce6a8, emissive:0x245c35, emissiveIntensity:.55, roughness:.38}));
-nuc.add(rna);
-const nMat=new THREE.MeshStandardMaterial({color:0xd889c8, roughness:.35, metalness:.08});
-for(let i=0;i<42;i++){
-  const t=i/42, p=rnaCurve.getPoint(t);
-  const bead=new THREE.Mesh(new THREE.SphereGeometry(.075,14,12),nMat);
-  bead.position.copy(p); nuc.add(bead);
-}
-
-// Surface distribution: spike trimers, membrane proteins, and small E proteins.
-const spikeGroup=new THREE.Group(); root.add(spikeGroup);
-const spikeMat=new THREE.MeshPhysicalMaterial({color:0xffb84d, roughness:.27, metalness:.04, clearcoat:.8, clearcoatRoughness:.2});
-const headMat=new THREE.MeshPhysicalMaterial({color:0xffd28a, roughness:.3, metalness:.02});
-function makeSpike(pos, normal){
-  const g=new THREE.Group(); g.position.copy(pos); g.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),normal);
-  const stem=new THREE.Mesh(new THREE.CylinderGeometry(.075,.12,.48,16),spikeMat); stem.position.y=.24; g.add(stem);
-  const neck=new THREE.Mesh(new THREE.SphereGeometry(.13,18,14),spikeMat); neck.position.y=.48; g.add(neck);
-  const head=new THREE.Mesh(new THREE.SphereGeometry(.22,24,18),headMat); head.scale.set(1.05,1.12,.95); head.position.y=.66; g.add(head);
-  // Three small lobes suggest the trimeric spike head.
-  for(let k=0;k<3;k++){const a=k*Math.PI*2/3; const l=new THREE.Mesh(new THREE.SphereGeometry(.105,14,12),headMat); l.position.set(.12*Math.cos(a),.7,.12*Math.sin(a)); g.add(l);}
-  spikeGroup.add(g);
-}
-const dirs=[];
-for(let i=0;i<46;i++){
-  const y=1-2*(i+.5)/46, phi=Math.PI*(1+Math.sqrt(5))*i;
-  const rr=Math.sqrt(1-y*y);
-  const v=new THREE.Vector3(Math.cos(phi)*rr,y,Math.sin(phi)*rr);
-  if(v.x<-.05 && v.z>.0) continue; // open viewing window
-  dirs.push(v); makeSpike(v.clone().multiplyScalar(R-.02),v);
-}
-const mMat=new THREE.MeshStandardMaterial({color:0xe7d36d, roughness:.4, metalness:.12});
-const eMat=new THREE.MeshStandardMaterial({color:0x4aa9c7, roughness:.35, metalness:.1});
-for(let i=0;i<38;i++){
-  const y=1-2*(i+.5)/38, phi=Math.PI*(1+Math.sqrt(5))*i+.7, rr=Math.sqrt(1-y*y);
-  const v=new THREE.Vector3(Math.cos(phi)*rr,y,Math.sin(phi)*rr);
-  if(v.x<-.15 && v.z>.05) continue;
-  const m=new THREE.Group(); m.position.copy(v.clone().multiplyScalar(R-.04)); m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v);
-  const body=new THREE.Mesh(new THREE.CylinderGeometry(.055,.075,.24,12),mMat); body.position.y=.1; m.add(body);
-  const cap=new THREE.Mesh(new THREE.SphereGeometry(.075,12,10),mMat); cap.position.y=.23; m.add(cap); root.add(m);
-}
-for(let i=0;i<16;i++){
-  const y=1-2*(i+.5)/16, phi=Math.PI*(1+Math.sqrt(5))*i+1.2, rr=Math.sqrt(1-y*y);
-  const v=new THREE.Vector3(Math.cos(phi)*rr,y,Math.sin(phi)*rr);
-  const e=new THREE.Mesh(new THREE.SphereGeometry(.075,12,10),eMat);
-  e.position.copy(v.multiplyScalar(R+.015)); e.scale.set(.8,1.35,.8); root.add(e);
-}
-
-// Thin outer halo, purely visual.
-const halo=new THREE.Mesh(new THREE.SphereGeometry(R+.035,64,48),new THREE.MeshBasicMaterial({color:0xc49aff,wireframe:true,transparent:true,opacity:.11}));
-root.add(halo);
-
-// Delicate orbital rings add a polished scientific-display feel.
-const orbitMat = new THREE.MeshBasicMaterial({color:0xc49aff, transparent:true, opacity:.22});
-for (const tilt of [[.25,.15,.1],[-.35,.55,.25]]) {
-  const ring = new THREE.Mesh(new THREE.TorusGeometry(R+0.42,.008,8,180), orbitMat);
-  ring.rotation.set(...tilt); root.add(ring);
-}
-
-// Soft illuminated base beneath the specimen.
-
-const base = new THREE.Mesh(
-  new THREE.CylinderGeometry(1.15, 1.35, 0.22, 64),
-  new THREE.MeshStandardMaterial({
-    color: 0x493263,
-    metalness: 0.35,
-    roughness: 0.4
-  })
-);
-base.position.y = -2.45;
-root.add(base);
-
-// Controles de rotação e zoom
-const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.06;
-controls.minDistance = 5;
-controls.maxDistance = 18;
-controls.target.set(0, 0, 0);
-
-// Rotação automática
-let rotating = true;
-let cutEnabled = true;
-let labelsEnabled = true;
-
-// Etiquetas
-const labelData = [
-  { text: "Proteína Spike (S)", pos: [2.8, 1.5, 0] },
-  { text: "Envelope viral (E)", pos: [-2.4, 0.8, 0] },
-  { text: "Proteína M", pos: [1.8, -1.5, 0] },
-  { text: "RNA viral", pos: [0, 0.8, 0.8] },
-  { text: "Nucleocapsídeo", pos: [-0.5, -1.2, 0.5] }
-];
-
-const labelElements = labelData.map(item => {
-  const el = document.createElement("div");
-  el.className = "tag";
-  el.textContent = item.text;
-  document.getElementById("labels").appendChild(el);
-  return {
-    element: el,
-    position: new THREE.Vector3(...item.pos)
-  };
-});
-
-// Botão de corte
-document.getElementById("cut").addEventListener("click", () => {
-  cutEnabled = !cutEnabled;
-  innerShell.visible = cutEnabled;
-  nuc.visible = cutEnabled;
-  document.getElementById("cut").textContent =
-    cutEnabled ? "Corte: ligado" : "Corte: desligado";
-  document.getElementById("cut").classList.toggle("active", cutEnabled);
-});
-
-// Botão de rotação
-document.getElementById("spin").addEventListener("click", () => {
-  rotating = !rotating;
-  document.getElementById("spin").textContent =
-    rotating ? "Rotação: ligada" : "Rotação: parada";
-  document.getElementById("spin").classList.toggle("active", rotating);
-});
-
-// Centralizar
-document.getElementById("reset").addEventListener("click", () => {
+  const host = document.getElementById('scene');
+  const scene = new THREE.Scene();
+  scene.fog = new THREE.Fog(0x1b102b, 12, 27);
+  const camera = new THREE.PerspectiveCamera(42, innerWidth/innerHeight, .1, 100);
   camera.position.set(0, 2.4, 10.5);
-  controls.target.set(0, 0, 0);
-  controls.update();
-  root.rotation.set(0, 0, 0);
-});
+  const renderer = new THREE.WebGLRenderer({antialias:true, alpha:true});
+  renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+  renderer.setSize(innerWidth, innerHeight);
+  renderer.outputColorSpace = THREE.SRGBColorSpace;
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.18;
+  host.appendChild(renderer.domElement);
 
-// Etiquetas
-document.getElementById("labelsBtn").addEventListener("click", () => {
-  labelsEnabled = !labelsEnabled;
-  document.getElementById("labels").style.display =
-    labelsEnabled ? "block" : "none";
-  document.getElementById("labelsBtn").textContent =
-    labelsEnabled ? "Etiquetas: ligadas" : "Etiquetas: desligadas";
-  document.getElementById("labelsBtn").classList.toggle("active", labelsEnabled);
-});
+  scene.add(new THREE.HemisphereLight(0xe6d5ff, 0x302044, 2.0));
+  const key = new THREE.DirectionalLight(0xffffff, 3.0); key.position.set(5,7,8); scene.add(key);
+  const rim = new THREE.PointLight(0xb58ce8, 35, 18); rim.position.set(-5,1,-5); scene.add(rim);
+  const fill = new THREE.PointLight(0xffc77c, 18, 15); fill.position.set(4,-4,4); scene.add(fill);
 
-// Atualização da tela
-function animate() {
-  requestAnimationFrame(animate);
+  const root = new THREE.Group(); scene.add(root);
+  const R = 2.15;
+  const sphereGeo = new THREE.SphereGeometry(R, 96, 72);
+  const envelopeMat = new THREE.MeshPhysicalMaterial({color:0x287e9d, roughness:.32, metalness:.05, transparent:true, opacity:.58, side:THREE.DoubleSide, transmission:.08, thickness:.2});
+  const envelope = new THREE.Mesh(sphereGeo, envelopeMat); root.add(envelope);
 
-  if (rotating) {
-    root.rotation.y += 0.0025;
+  const cutGroup = new THREE.Group(); root.add(cutGroup);
+  const innerGeo = new THREE.SphereGeometry(R*.79, 72, 56);
+  const innerMat = new THREE.MeshPhysicalMaterial({color:0x25364b, roughness:.72, metalness:.08, transparent:true, opacity:.9, side:THREE.DoubleSide});
+  const innerShell = new THREE.Mesh(innerGeo, innerMat); cutGroup.add(innerShell);
+
+  const nuc = new THREE.Group(); root.add(nuc);
+  const nucGeo = new THREE.SphereGeometry(1.15, 48, 36);
+  const nucMesh = new THREE.Mesh(nucGeo, new THREE.MeshPhysicalMaterial({color:0x7850a8, roughness:.4, transparent:true, opacity:.23, side:THREE.DoubleSide}));
+  nuc.add(nucMesh);
+  const curvePts=[];
+  for(let i=0;i<520;i++){
+    const t=i/519, a=t*Math.PI*13;
+    const rad=.18+.75*t;
+    curvePts.push(new THREE.Vector3(rad*Math.cos(a), .58*Math.sin(a*1.7), rad*Math.sin(a)));
+  }
+  const rnaCurve=new THREE.CatmullRomCurve3(curvePts);
+  const rna=new THREE.Mesh(new THREE.TubeGeometry(rnaCurve, 700, .035, 8, false), new THREE.MeshStandardMaterial({color:0x9ce6a8, emissive:0x245c35, emissiveIntensity:.55, roughness:.38}));
+  nuc.add(rna);
+  const nMat=new THREE.MeshStandardMaterial({color:0xd889c8, roughness:.35, metalness:.08});
+  for(let i=0;i<42;i++){
+    const t=i/42, p=rnaCurve.getPoint(t);
+    const bead=new THREE.Mesh(new THREE.SphereGeometry(.075,14,12),nMat);
+    bead.position.copy(p); nuc.add(bead);
   }
 
-  controls.update();
+  const spikeGroup=new THREE.Group(); root.add(spikeGroup);
+  const spikeMat=new THREE.MeshPhysicalMaterial({color:0xffb84d, roughness:.27, metalness:.04, clearcoat:.8, clearcoatRoughness:.2});
+  const headMat=new THREE.MeshPhysicalMaterial({color:0xffd28a, roughness:.3, metalness:.02});
+  function makeSpike(pos, normal){
+    const g=new THREE.Group(); g.position.copy(pos); g.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),normal);
+    const stem=new THREE.Mesh(new THREE.CylinderGeometry(.075,.12,.48,16),spikeMat); stem.position.y=.24; g.add(stem);
+    const neck=new THREE.Mesh(new THREE.SphereGeometry(.13,18,14),spikeMat); neck.position.y=.48; g.add(neck);
+    const head=new THREE.Mesh(new THREE.SphereGeometry(.22,24,18),headMat); head.scale.set(1.05,1.12,.95); head.position.y=.66; g.add(head);
+    for(let k=0;k<3;k++){const a=k*Math.PI*2/3; const l=new THREE.Mesh(new THREE.SphereGeometry(.105,14,12),headMat); l.position.set(.12*Math.cos(a),.7,.12*Math.sin(a)); g.add(l);}
+    spikeGroup.add(g);
+  }
+  for(let i=0;i<46;i++){
+    const y=1-2*(i+.5)/46, phi=Math.PI*(1+Math.sqrt(5))*i;
+    const rr=Math.sqrt(1-y*y);
+    const v=new THREE.Vector3(Math.cos(phi)*rr,y,Math.sin(phi)*rr);
+    if(v.x<-.05 && v.z>.0) continue;
+    makeSpike(v.clone().multiplyScalar(R-.02),v);
+  }
+  const mMat=new THREE.MeshStandardMaterial({color:0xe7d36d, roughness:.4, metalness:.12});
+  const eMat=new THREE.MeshStandardMaterial({color:0x4aa9c7, roughness:.35, metalness:.1});
+  for(let i=0;i<38;i++){
+    const y=1-2*(i+.5)/38, phi=Math.PI*(1+Math.sqrt(5))*i+.7, rr=Math.sqrt(1-y*y);
+    const v=new THREE.Vector3(Math.cos(phi)*rr,y,Math.sin(phi)*rr);
+    if(v.x<-.15 && v.z>.05) continue;
+    const m=new THREE.Group(); m.position.copy(v.clone().multiplyScalar(R-.04)); m.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),v);
+    const body=new THREE.Mesh(new THREE.CylinderGeometry(.055,.075,.24,12),mMat); body.position.y=.1; m.add(body);
+    const cap=new THREE.Mesh(new THREE.SphereGeometry(.075,12,10),mMat); cap.position.y=.23; m.add(cap); root.add(m);
+  }
+  for(let i=0;i<16;i++){
+    const y=1-2*(i+.5)/16, phi=Math.PI*(1+Math.sqrt(5))*i+1.2, rr=Math.sqrt(1-y*y);
+    const v=new THREE.Vector3(Math.cos(phi)*rr,y,Math.sin(phi)*rr);
+    const e=new THREE.Mesh(new THREE.SphereGeometry(.075,12,10),eMat);
+    e.position.copy(v.multiplyScalar(R+.015)); e.scale.set(.8,1.35,.8); root.add(e);
+  }
+  const halo=new THREE.Mesh(new THREE.SphereGeometry(R+.035,64,48),new THREE.MeshBasicMaterial({color:0xc49aff,wireframe:true,transparent:true,opacity:.11}));
+  root.add(halo);
+  const orbitMat = new THREE.MeshBasicMaterial({color:0xc49aff, transparent:true, opacity:.22});
+  for (const tilt of [[.25,.15,.1],[-.35,.55,.25]]) {
+    const ring = new THREE.Mesh(new THREE.TorusGeometry(R+0.42,.008,8,180), orbitMat);
+    ring.rotation.set(...tilt); root.add(ring);
+  }
+  const base = new THREE.Mesh(
+    new THREE.CylinderGeometry(1.15, 1.35, 0.22, 64),
+    new THREE.MeshStandardMaterial({ color: 0x493263, metalness: 0.35, roughness: 0.4 })
+  );
+  base.position.y = -2.45;
+  root.add(base);
 
-  labelElements.forEach(label => {
-    const p = label.position.clone();
-    p.applyMatrix4(root.matrixWorld);
-    p.project(camera);
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.06;
+  controls.minDistance = 5;
+  controls.maxDistance = 18;
+  controls.target.set(0, 0, 0);
 
-    const x = (p.x * 0.5 + 0.5) * innerWidth;
-    const y = (-p.y * 0.5 + 0.5) * innerHeight;
+  let rotating = true;
+  let cutEnabled = true;
+  let labelsEnabled = true;
 
-    label.element.style.left = x + "px";
-    label.element.style.top = y + "px";
-    label.element.style.display = p.z < 1 ? "block" : "none";
-  });
-
-  renderer.render(scene, camera);
-}
-
-animate();
-
-// Ajuste ao tamanho da tela
-window.addEventListener("resize", () => {
-  camera.aspect = window.innerWidth / window.innerHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(window.innerWidth, window.innerHeight);
-});
-      
+  const labelData = [
+    { text: "Proteína Spike (S)", pos: [2.8, 1.5, 0] },
+    { text: "Envelope viral (E)", pos: [-2.4, 0.8, 0] },
+    { text: "Proteína M", pos: [1.8, -1.5, 0] },
+    { text: "RNA viral", pos: [0, 0.8, 0.8] },
+    { text: "Nucleocapsídeo", pos: [-0.5, -1.2, 0.5] }
+  ];
+  const labelElements = labelData.map(item => {
+    con
