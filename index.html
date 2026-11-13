@@ -259,4 +259,119 @@ for (const tilt of [[.25,.15,.1],[-.35,.55,.25]]) {
 }
 
 // Soft illuminated base beneath the specimen.
-const base = new THREE.Mesh(new T
+
+const base = new THREE.Mesh(
+  new THREE.CylinderGeometry(1.15, 1.35, 0.22, 64),
+  new THREE.MeshStandardMaterial({
+    color: 0x493263,
+    metalness: 0.35,
+    roughness: 0.4
+  })
+);
+base.position.y = -2.45;
+root.add(base);
+
+// Controles de rotação e zoom
+const controls = new OrbitControls(camera, renderer.domElement);
+controls.enableDamping = true;
+controls.dampingFactor = 0.06;
+controls.minDistance = 5;
+controls.maxDistance = 18;
+controls.target.set(0, 0, 0);
+
+// Rotação automática
+let rotating = true;
+let cutEnabled = true;
+let labelsEnabled = true;
+
+// Etiquetas
+const labelData = [
+  { text: "Proteína Spike (S)", pos: [2.8, 1.5, 0] },
+  { text: "Envelope viral (E)", pos: [-2.4, 0.8, 0] },
+  { text: "Proteína M", pos: [1.8, -1.5, 0] },
+  { text: "RNA viral", pos: [0, 0.8, 0.8] },
+  { text: "Nucleocapsídeo", pos: [-0.5, -1.2, 0.5] }
+];
+
+const labelElements = labelData.map(item => {
+  const el = document.createElement("div");
+  el.className = "tag";
+  el.textContent = item.text;
+  document.getElementById("labels").appendChild(el);
+  return {
+    element: el,
+    position: new THREE.Vector3(...item.pos)
+  };
+});
+
+// Botão de corte
+document.getElementById("cut").addEventListener("click", () => {
+  cutEnabled = !cutEnabled;
+  innerShell.visible = cutEnabled;
+  nuc.visible = cutEnabled;
+  document.getElementById("cut").textContent =
+    cutEnabled ? "Corte: ligado" : "Corte: desligado";
+  document.getElementById("cut").classList.toggle("active", cutEnabled);
+});
+
+// Botão de rotação
+document.getElementById("spin").addEventListener("click", () => {
+  rotating = !rotating;
+  document.getElementById("spin").textContent =
+    rotating ? "Rotação: ligada" : "Rotação: parada";
+  document.getElementById("spin").classList.toggle("active", rotating);
+});
+
+// Centralizar
+document.getElementById("reset").addEventListener("click", () => {
+  camera.position.set(0, 2.4, 10.5);
+  controls.target.set(0, 0, 0);
+  controls.update();
+  root.rotation.set(0, 0, 0);
+});
+
+// Etiquetas
+document.getElementById("labelsBtn").addEventListener("click", () => {
+  labelsEnabled = !labelsEnabled;
+  document.getElementById("labels").style.display =
+    labelsEnabled ? "block" : "none";
+  document.getElementById("labelsBtn").textContent =
+    labelsEnabled ? "Etiquetas: ligadas" : "Etiquetas: desligadas";
+  document.getElementById("labelsBtn").classList.toggle("active", labelsEnabled);
+});
+
+// Atualização da tela
+function animate() {
+  requestAnimationFrame(animate);
+
+  if (rotating) {
+    root.rotation.y += 0.0025;
+  }
+
+  controls.update();
+
+  labelElements.forEach(label => {
+    const p = label.position.clone();
+    p.applyMatrix4(root.matrixWorld);
+    p.project(camera);
+
+    const x = (p.x * 0.5 + 0.5) * innerWidth;
+    const y = (-p.y * 0.5 + 0.5) * innerHeight;
+
+    label.element.style.left = x + "px";
+    label.element.style.top = y + "px";
+    label.element.style.display = p.z < 1 ? "block" : "none";
+  });
+
+  renderer.render(scene, camera);
+}
+
+animate();
+
+// Ajuste ao tamanho da tela
+window.addEventListener("resize", () => {
+  camera.aspect = window.innerWidth / window.innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(window.innerWidth, window.innerHeight);
+});
+      
